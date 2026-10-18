@@ -12,6 +12,7 @@ library("fastqcr")
 library("sleuth")
 url<-"https://github.com/Scta93/sleuth_for_genomics/raw/refs/heads/main/R_data_2026_for_genomics_lab.RData"
 download.file(url,'env.renv')
+print("environment downloaded")
 load(file="env.renv")
 print("environment loaded")
 s2c<-read.csv2("s2c.tsv",sep = '\t',header = T)
