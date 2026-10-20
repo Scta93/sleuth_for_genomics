@@ -20,35 +20,12 @@ library(googledrive)
 library("fastqcr")
 library("sleuth")
 
-#This for loop downloads my kallisto results into your working directory 
+#This downloads my kallisto results (which is a tar.gz file) into your working directory 
 drive_deauth()
-#folder link to id
-jp_folder = "https://drive.google.com/drive/folders/12o7AxfyFF3nZiUFi7deF8rGp7OeMc37F?usp=sharing"
-folder_id = drive_get(as_id(jp_folder))
-#find files in folder
-files = drive_ls(folder_id)
-?drive_ls
-#loop dirs and download files inside them
-for (i in seq_along(files$name)) {
-  #list files
-  i_dir = drive_ls(files[i, ])
-  
-  #mkdir
-  dir.create(files$name[i],
-            showWarnings = FALSE)
-  
-  #download files
-  for (file_i in seq_along(i_dir$name)) {
-    #fails if already exists
-    try({
-      drive_download(
-        as_id(i_dir$id[file_i]),
-        path = str_c(files$name[i], "/", i_dir$name[file_i]),
-        overwrite = TRUE
-      )
-    })
-  }
-}
+drive_download(as_id("https://drive.google.com/file/d/1ox2E9x-baA0K0rv6TzarVWa5jGmjItTs/view?usp=sharing"), overwrite = T)
+
+#this unzips and unpacks the tar file
+untar("kallisto_genomics_2026_tar.gz")
 
 #This downloads the R environmnent then loads it 
 url<-"https://github.com/Scta93/sleuth_for_genomics/raw/refs/heads/main/R_data_2026_for_genomics_lab.RData"
