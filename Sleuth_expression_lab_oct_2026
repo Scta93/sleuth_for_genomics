@@ -1,3 +1,4 @@
+#This installs all the required packages -------------
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 if (!requireNamespace("rhdf5", quietly = TRUE))
@@ -8,16 +9,58 @@ if (!requireNamespace("sleuth", quietly = TRUE))
   devtools::install_github("pachterlab/sleuth",upgrade='never')
 if (!requireNamespace("fastqcr", quietly = TRUE))
   devtools::install_github("kassambara/fastqcr",upgrade='never')
+if (!requireNamespace("stringr", quietly = TRUE))
+  install.packages("stringr")
+if (!requireNamespace("googledrive", quietly = TRUE))
+  install.packages("googledrive")
+
+#This then loads the packages
+library(stringr)
+library(googledrive)
 library("fastqcr")
 library("sleuth")
+
+#This for loop downloads my kallisto results into your working directory 
+drive_deauth()
+#folder link to id
+jp_folder = "https://drive.google.com/drive/folders/12o7AxfyFF3nZiUFi7deF8rGp7OeMc37F?usp=sharing"
+folder_id = drive_get(as_id(jp_folder))
+#find files in folder
+files = drive_ls(folder_id)
+?drive_ls
+#loop dirs and download files inside them
+for (i in seq_along(files$name)) {
+  #list files
+  i_dir = drive_ls(files[i, ])
+  
+  #mkdir
+  dir.create(files$name[i])
+  
+  #download files
+  for (file_i in seq_along(i_dir$name)) {
+    #fails if already exists
+    try({
+      drive_download(
+        as_id(i_dir$id[file_i]),
+        path = str_c(files$name[i], "/", i_dir$name[file_i])
+      )
+    })
+  }
+}
+
+#This downloads the R environmnent then loads it 
 url<-"https://github.com/Scta93/sleuth_for_genomics/raw/refs/heads/main/R_data_2026_for_genomics_lab.RData"
 download.file(url,'env.renv')
 print("environment downloaded")
 load(file="env.renv")
 print("environment loaded")
+
+#This is the actual script to run sleuth
 s2c<-read.csv2("s2c.tsv",sep = '\t',header = T)
 s2c <- dplyr::mutate(s2c, path = kal_dirs[,2])
 swt_prep<-sleuth_prep(s2c,read_bootstrap_tpm=T, ~ condition)
 swt_fit<-sleuth_fit(swt_prep)
 swt<-sleuth_wt(swt_fit,'conditionvenom')
+
+#You may have to run this command again to have the window actually pop up for you 
 sleuth_live(swt)
