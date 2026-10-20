@@ -34,7 +34,7 @@ for (i in seq_along(files$name)) {
   i_dir = drive_ls(files[i, ])
   
   #mkdir
-  dir.create(files$name[i], 
+  dir.create(files$name[i],
             showWarnings = FALSE)
   
   #download files
