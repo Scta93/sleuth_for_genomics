@@ -35,7 +35,6 @@ load(file="env.renv")
 print("environment loaded")
 
 #This is the actual script to run sleuth
-s2c<-read.csv2("s2c.tsv",sep = '\t',header = T)
 s2c <- dplyr::mutate(s2c, path = kal_dirs[,2])
 swt_prep<-sleuth_prep(s2c,read_bootstrap_tpm=T, ~ condition)
 swt_fit<-sleuth_fit(swt_prep)
